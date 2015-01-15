@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
-import os, unittest, tempfile, datetime, urllib2, logging
+import os
+import unittest
+import datetime
+import logging
+from re import match
+
 from httmock import response, HTTMock
 from mock import Mock
-from time import time
-from re import match
+
 
 root_logger = logging.getLogger()
 root_logger.disabled = True
@@ -43,7 +47,6 @@ class RunUpdateTestCase(unittest.TestCase):
         return urllib2.urlopen
 
     def response_content(self, url, request):
-        import run_update
 
         if url.geturl() == 'http://example.com/cfa-projects.csv':
             return response(200, '''name,description,link_url,code_url,type,categories\n,"Thing for ""stuff"".",,https://github.com/codeforamerica/cityvoice,web service,"community engagement, housing"\nSouthBendVoices,,,https://github.com/codeforamerica/cityvoice,,''')
@@ -210,7 +213,6 @@ class RunUpdateTestCase(unittest.TestCase):
             an error message should be logged.
         '''
         def response_content(url, request):
-            import run_update
 
             if url.geturl() == 'http://example.com/cfa-projects.csv':
                 return response(200, '''name,description,link_url,code_url,type,categories\n,,http://google.com,https://github.com/codeforamerica/cityvoice,,''')
@@ -239,7 +241,6 @@ class RunUpdateTestCase(unittest.TestCase):
         ''' When github returns a non-404 error code, an IOError should be raised.
         '''
         def response_content(url, request):
-            import run_update
 
             if url.geturl() == 'http://example.com/cfa-projects.csv':
                 return response(200, '''name,description,link_url,code_url,type,categories\n,,,https://github.com/codeforamerica/cityvoice,,''')
@@ -260,7 +261,6 @@ class RunUpdateTestCase(unittest.TestCase):
         ''' When an organization has a weird name, ...
         '''
         def response_content(url, request):
-            import run_update
 
             if "docs.google.com" in url:
                 return response(200, '''name\nCode_for-America''')
@@ -312,7 +312,6 @@ class RunUpdateTestCase(unittest.TestCase):
         ''' When an organization has a badly formed events url is passed, no events are saved
         '''
         def response_content(url, request):
-            import run_update
 
             if "docs.google.com" in url:
                 return response(200, '''name,events_url\nCode for America,http://www.meetup.com/events/foo-%%%''')
@@ -339,7 +338,6 @@ class RunUpdateTestCase(unittest.TestCase):
             message should be logged
         '''
         def response_content(url, request):
-            import run_update
 
             if "docs.google.com" in url:
                 return response(200, '''name,events_url\nCode for America,http://www.meetup.com/events/Code-For-Charlotte''')
@@ -517,7 +515,6 @@ class RunUpdateTestCase(unittest.TestCase):
         ''' Get a project list that doesn't have all the columns.
             Don't die.
         '''
-        from app import Project
         from factories import OrganizationFactory, ProjectFactory
 
         organization = OrganizationFactory(name=u'TEST ORG', projects_list_url=u'http://www.gdocs.com/projects.csv')
